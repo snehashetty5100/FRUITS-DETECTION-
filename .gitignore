@@ -1,0 +1,38 @@
+# Python Bytecode and Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Environments
+.venv/
+env/
+venv/
+ENV/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Model checkpoints and large binaries (keep folder structure via .gitkeep)
+models/*.h5
+models/*.keras
+models/*.pkl
+models/*.joblib
+!models/.gitkeep
+
+# Results cache (keep folder structure)
+results/figures/*.png
+results/figures/*.jpg
+!results/figures/.gitkeep
+results/metrics/*.csv
+!results/metrics/.gitkeep
