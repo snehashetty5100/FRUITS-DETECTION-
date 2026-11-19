@@ -18,7 +18,7 @@ st.set_page_config(
     layout="wide"
 )
 
-st.title("🍎 Fruit Ripeness Detection System")
+st.title(" Fruit Ripeness Detection System")
 st.markdown(
     "Identify fruit ripeness stages (**Unripe**, **Ripe**, **Overripe**) "
     "using **Colour Segmentation** and **Machine Learning**."
