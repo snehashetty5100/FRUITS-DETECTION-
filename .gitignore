@@ -29,6 +29,8 @@ models/*.keras
 models/*.pkl
 models/*.joblib
 !models/.gitkeep
+!models/ripeness_classifier.pkl
+!models/ripeness_cnn.keras
 
 # Results cache (keep folder structure)
 results/figures/*.png
@@ -36,3 +38,8 @@ results/figures/*.jpg
 !results/figures/.gitkeep
 results/metrics/*.csv
 !results/metrics/.gitkeep
+
+# External datasets
+dataset/fruits360/
+dataset/ripeness/
+*.zip

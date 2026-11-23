@@ -1,107 +1,76 @@
-"""Dataset Preparation and Validation Utilities
+"""Dataset Preparation and Validation Utilities for Fruits-360
 
-Resilient module to:
-1. Verify dataset structure across all 6 fruits and 3 ripeness stages.
-2. Scan and check image file integrity (detecting corrupt or unreadable files).
-3. Generate dataset summary statistics (class distribution and balance).
-4. Standardize and process raw images into dataset/processed/ with resizing.
+Module to:
+1. Scan and verify Fruits-360 dataset structure across target fruit classes.
+2. Check image file integrity in Training and Test partitions.
+3. Provide summary breakdowns of available sample images.
 """
 
-import os
+import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from PIL import Image
 
-# Supported fruits and ripeness stages
-SUPPORTED_FRUITS = ["apple", "banana", "mango", "orange", "papaya", "tomato"]
-RIPENESS_STAGES = ["unripe", "ripe", "overripe"]
+FRUITS360_DIR = Path("dataset/fruits360")
+TARGET_FRUITS = ["apple", "banana", "mango", "orange", "papaya", "tomato"]
+EXCLUDE_WORDS = ["mangostan", "pepper", "pineapple"]
 
 
-def scan_dataset(base_dir: str = "dataset/raw") -> List[Dict[str, any]]:
-    """Scan dataset directory and verify valid images per category using Pillow."""
-    valid_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
+def scan_fruits360(split: str = "Training") -> List[Dict[str, any]]:
+    """Scan Fruits-360 directory for target fruit classes and verify image integrity."""
+    split_dir = FRUITS360_DIR / split
+    valid_extensions = {".jpg", ".jpeg", ".png"}
     records = []
 
-    for fruit in SUPPORTED_FRUITS:
-        for stage in RIPENESS_STAGES:
-            stage_dir = Path(base_dir) / fruit / stage
+    if not split_dir.exists():
+        return records
+
+    for cls_dir in sorted(split_dir.iterdir()):
+        if not cls_dir.is_dir():
+            continue
+        cls_lower = cls_dir.name.lower()
+        if any(kw in cls_lower for kw in TARGET_FRUITS) and not any(ex in cls_lower for ex in EXCLUDE_WORDS):
             valid_count = 0
             corrupt_count = 0
-
-            if stage_dir.exists():
-                for file_path in stage_dir.iterdir():
-                    if file_path.is_file() and file_path.suffix.lower() in valid_extensions:
-                        try:
-                            with Image.open(file_path) as img:
-                                img.verify()
-                            valid_count += 1
-                        except Exception:
-                            corrupt_count += 1
+            for file_path in cls_dir.iterdir():
+                if file_path.is_file() and file_path.suffix.lower() in valid_extensions:
+                    try:
+                        with Image.open(file_path) as img:
+                            img.verify()
+                        valid_count += 1
+                    except Exception:
+                        corrupt_count += 1
 
             records.append({
-                "Fruit": fruit.capitalize(),
-                "Ripeness Stage": stage.capitalize(),
+                "Class": cls_dir.name,
+                "Split": split,
                 "Valid Images": valid_count,
-                "Corrupt/Invalid": corrupt_count,
-                "Path": str(stage_dir)
+                "Corrupt": corrupt_count,
+                "Path": str(cls_dir)
             })
 
     return records
 
 
-def print_summary(base_dir: str = "dataset/raw"):
-    """Display tabular breakdown of dataset."""
-    records = scan_dataset(base_dir)
-    print(f"\n{'Fruit':<10} | {'Ripeness Stage':<15} | {'Valid Images':<12} | {'Directory'}")
-    print("-" * 75)
-    total_valid = 0
-    for r in records:
-        print(f"{r['Fruit']:<10} | {r['Ripeness Stage']:<15} | {r['Valid Images']:<12} | {r['Path']}")
-        total_valid += r["Valid Images"]
-    print("-" * 75)
-    print(f"Total Valid Images in '{base_dir}': {total_valid}\n")
-
-
-def process_raw_dataset(
-    raw_dir: str = "dataset/raw",
-    processed_dir: str = "dataset/processed",
-    target_size: Tuple[int, int] = (224, 224)
-) -> Dict[str, int]:
-    """Process raw images: open, resize to standard dimensions, and save to processed directory."""
-    valid_extensions = {".jpg", ".jpeg", ".png", ".bmp", ".webp"}
-    processed_counts = {}
-
-    for fruit in SUPPORTED_FRUITS:
-        for stage in RIPENESS_STAGES:
-            src_stage_dir = Path(raw_dir) / fruit / stage
-            dest_stage_dir = Path(processed_dir) / fruit / stage
-            dest_stage_dir.mkdir(parents=True, exist_ok=True)
-
-            key = f"{fruit}_{stage}"
-            processed_counts[key] = 0
-
-            if not src_stage_dir.exists():
-                continue
-
-            for file_path in src_stage_dir.iterdir():
-                if file_path.is_file() and file_path.suffix.lower() in valid_extensions:
-                    try:
-                        with Image.open(file_path) as img:
-                            rgb_img = img.convert("RGB")
-                            resized = rgb_img.resize(target_size, Image.Resampling.LANCZOS)
-                            out_filename = f"{file_path.stem}.png"
-                            dest_file = dest_stage_dir / out_filename
-                            resized.save(dest_file, "PNG")
-                            processed_counts[key] += 1
-                    except Exception as e:
-                        print(f"Skipping corrupt image {file_path}: {e}")
-
-    return processed_counts
+def print_fruits360_summary():
+    """Display tabular breakdown of Fruits-360 target categories."""
+    for split in ["Training", "Test"]:
+        records = scan_fruits360(split)
+        print(f"\n=== Fruits-360 {split} Split Summary ===")
+        print(f"{'Class Folder':<28} | {'Valid Images':<12} | {'Directory'}")
+        print("-" * 75)
+        total_valid = 0
+        for r in records:
+            print(f"{r['Class']:<28} | {r['Valid Images']:<12} | {r['Path']}")
+            total_valid += r["Valid Images"]
+        print("-" * 75)
+        print(f"Total Valid Images in '{split}': {total_valid}")
 
 
 if __name__ == "__main__":
-    print_summary("dataset/raw")
-    print("Processing raw images into dataset/processed (224x224)...")
-    counts = process_raw_dataset()
-    print("\nProcessed images summary:")
-    print_summary("dataset/processed")
+    print_fruits360_summary()

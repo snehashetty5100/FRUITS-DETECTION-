@@ -1,0 +1,5 @@
+filename,sample,fruit,stage,flag_reason
+tomato_overripe_003.jpg,tomato_overripe_003,tomato,overripe,Contains almonds / mixed nuts in the composition alongside the tomato.
+apple_unripe_004.jpg,apple_unripe_004,apple,unripe,"Cross-section of Granny Smith apple showing predominant white/pale flesh (mean H=30.0), masking the green skin hue."
+banana_unripe_001.jpg,banana_unripe_001,banana,unripe,Transitionally ripening bananas with chartreuse/yellow peel (mean H=25.8) rather than physiological green.
+banana_unripe_002.jpg,banana_unripe_002,banana,unripe,Baby bananas cluster / distinct cultivar rather than standard Cavendish variety.

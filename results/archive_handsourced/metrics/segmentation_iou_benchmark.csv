@@ -1,0 +1,13 @@
+Sample,Fruit,Stage,KMeans_Raw_IoU,KMeans_Clean_IoU,HSV_Raw_IoU,HSV_Clean_IoU
+apple_ripe_002,Apple,Ripe,0.7277,0.8572,0.7712,0.911
+apple_unripe_002,Apple,Unripe,0.2082,0.2172,0.0,0.0
+banana_overripe_002,Banana,Overripe,0.1628,0.1683,0.151,0.1683
+banana_ripe_001,Banana,Ripe,0.0,0.0,0.9455,0.9437
+banana_unripe_001,Banana,Unripe,0.5704,0.5868,0.0,0.0
+mango_ripe_002,Mango,Ripe,0.7046,0.7578,0.2341,0.2013
+mango_unripe_002,Mango,Unripe,0.8628,0.9388,0.0001,0.0
+orange_ripe_001,Orange,Ripe,0.545,0.5601,0.9625,0.9418
+orange_unripe_001,Orange,Unripe,0.6784,0.6974,0.0,0.0
+papaya_ripe_002,Papaya,Ripe,0.5372,0.5641,0.4513,0.5641
+papaya_unripe_001,Papaya,Unripe,0.6224,0.6853,0.0001,0.0
+tomato_ripe_001,Tomato,Ripe,0.4628,0.4968,0.6933,0.6837

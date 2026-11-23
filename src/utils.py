@@ -1,15 +1,15 @@
 """Utility Helper Functions
 
-This module provides helpers for:
+Pure Python + Matplotlib + Seaborn utilities:
 1. Plotting and saving confusion matrices.
-2. Saving evaluation metrics to CSV.
-3. Color visualization helpers.
+2. Saving evaluation metrics to CSV via the csv module.
+3. Visualization helpers.
 """
 
+import csv
 import os
-from typing import List, Dict
+from typing import List, Dict, Any
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
 
 
@@ -52,13 +52,16 @@ def plot_confusion_matrix(
     return fig
 
 
-def save_metrics_to_csv(metrics: Dict[str, any], save_path: str) -> None:
-    """Export evaluation metrics to a CSV file.
+def save_metrics_to_csv(metrics: Dict[str, Any], save_path: str) -> None:
+    """Export evaluation metrics to a CSV file using standard library csv module.
 
     Args:
         metrics (dict): Key-value pairs of metrics.
         save_path (str): File destination.
     """
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    df = pd.DataFrame([metrics])
-    df.to_csv(save_path, index=False)
+    fieldnames = list(metrics.keys())
+    with open(save_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerow(metrics)

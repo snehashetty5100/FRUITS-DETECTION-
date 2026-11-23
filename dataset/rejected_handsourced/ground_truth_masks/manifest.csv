@@ -1,0 +1,13 @@
+filename,source,split,verified
+apple_ripe_002_mask.png,ai_reviewed,tune,no
+apple_unripe_002_mask.png,ai_reviewed,heldout,no
+banana_overripe_002_mask.png,ai_reviewed,heldout,no
+banana_ripe_001_mask.png,ai_reviewed,tune,no
+banana_ripe_004_mask.png,ai_reviewed,tune,no
+mango_ripe_002_mask.png,ai_reviewed,heldout,no
+mango_unripe_002_mask.png,ai_reviewed,tune,no
+orange_ripe_001_mask.png,ai_reviewed,tune,no
+orange_unripe_001_mask.png,ai_reviewed,heldout,no
+papaya_ripe_002_mask.png,ai_reviewed,heldout,no
+papaya_unripe_001_mask.png,ai_reviewed,tune,no
+tomato_ripe_001_mask.png,ai_reviewed,tune,no

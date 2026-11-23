@@ -1,0 +1,13 @@
+filename,sample,fruit,stage,split,source,status,kmeans_iou,kmeans_dice,hsv_iou,hsv_dice
+apple_ripe_002_mask.png,apple_ripe_002,Apple,Ripe,tune,ai_reviewed,provisional,0.5722,0.7279,0.9117,0.9538
+apple_unripe_002_mask.png,apple_unripe_002,Apple,Unripe,heldout,ai_reviewed,provisional,0.7069,0.8283,0.0,0.0
+banana_overripe_002_mask.png,banana_overripe_002,Banana,Overripe,heldout,ai_reviewed,provisional,0.3183,0.4829,0.0,0.0
+banana_ripe_001_mask.png,banana_ripe_001,Banana,Ripe,tune,ai_reviewed,provisional,0.9819,0.9909,0.9567,0.9779
+banana_ripe_004_mask.png,banana_ripe_004,Banana,Ripe,tune,ai_reviewed,provisional,0.1899,0.3192,0.4437,0.6146
+mango_ripe_002_mask.png,mango_ripe_002,Mango,Ripe,heldout,ai_reviewed,provisional,0.708,0.829,0.4594,0.6295
+mango_unripe_002_mask.png,mango_unripe_002,Mango,Unripe,tune,ai_reviewed,provisional,0.5399,0.7012,0.3692,0.5393
+orange_ripe_001_mask.png,orange_ripe_001,Orange,Ripe,tune,ai_reviewed,provisional,0.5337,0.696,0.5297,0.6926
+orange_unripe_001_mask.png,orange_unripe_001,Orange,Unripe,heldout,ai_reviewed,provisional,0.6788,0.8086,0.7304,0.8442
+papaya_ripe_002_mask.png,papaya_ripe_002,Papaya,Ripe,heldout,ai_reviewed,provisional,0.8561,0.9224,0.222,0.3633
+papaya_unripe_001_mask.png,papaya_unripe_001,Papaya,Unripe,tune,ai_reviewed,provisional,0.4168,0.5884,0.0,0.0
+tomato_ripe_001_mask.png,tomato_ripe_001,Tomato,Ripe,tune,ai_reviewed,provisional,0.7952,0.8859,0.6898,0.8164

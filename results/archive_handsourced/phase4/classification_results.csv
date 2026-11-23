@@ -1,0 +1,5 @@
+model,samples_n,mask_accuracy,mask_macro_f1,full_accuracy,full_macro_f1,segmentation_gain_acc,segmentation_gain_f1
+Majority Baseline,51,0.3529,0.1739,0.3529,0.1739,0.0,0.0
+k-NN (k=3),51,0.3725,0.3722,0.4314,0.4342,-0.0588,-0.062
+SVM (RBF Kernel),51,0.4902,0.4899,0.451,0.4359,0.0392,0.054
+Random Forest (100 trees),51,0.5098,0.511,0.4902,0.4923,0.0196,0.0186
