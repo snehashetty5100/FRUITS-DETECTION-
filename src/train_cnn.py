@@ -3,7 +3,7 @@
 Trains a lightweight 3-layer CNN on segmented fruit images (100x100 resolution):
 - Data: Train (2,832), Val (607), Test (608) from dataset/ripeness_splits.csv.
 - Architecture:
-    Conv2D(32, 3x3) -> MaxPool -> Conv2D(64, 3x3) -> MaxPool -> Conv2D(64, 3x3) -> GlobalAvgPool -> Dropout -> Dense(3, softmax)
+    Conv2D(32, 3x3) -> MaxPool -> Conv2D(64, 3x3) -> MaxPool -> Conv2D(64, 3x3) -> MaxPool -> GlobalAvgPool -> Dropout -> Dense(64) -> Dense(3, softmax)
 - Evaluated on the Test split and metrics appended to results/final/results.md.
 """
 

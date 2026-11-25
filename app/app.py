@@ -1,10 +1,10 @@
 """Fruit Ripeness Detection & Colour Segmentation Web Application
 
 Interactive Streamlit interface:
-1. Upload any fruit photo (or choose from verified test split samples).
+1. Upload any fruit photo (or choose from train-split sample images).
 2. Performs automated CIE-Lab K-Means (K=3) segmentation with morphological cleanup.
 3. Displays Original Photo, Binary Mask, and Segmented Fruit side-by-side.
-4. Extracts 34 color moments and circular Hue histogram features.
+4. Extracts 34 color moments and a 16-bin histogram over hue 0-180 (not circular).
 5. Predicts ripeness stage (Unripe, Ripe, Overripe) with model confidence and class probabilities.
 
 Zero cv2, zero pandas. Uses Pillow, NumPy, SciPy, scikit-learn, and Streamlit.

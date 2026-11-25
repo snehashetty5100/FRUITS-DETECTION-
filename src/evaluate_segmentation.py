@@ -6,7 +6,7 @@ Evaluates:
 3. Full Morphological Post-Processing (Opening, Closing, Hole Filling, Largest Component).
 
 Evaluation Protocol:
-- Reads dataset/ground_truth_masks/manifest.csv.
+- Reads dataset/manifest.csv (code uses MANIFEST_PATH = Path("dataset/manifest.csv"), not dataset/ground_truth_masks/manifest.csv).
 - ONLY evaluates masks marked as verified=yes.
 - Reports per-image IoU/Dice, per-fruit mean (n), and overall mean (n).
 - Evaluates Tune vs Held-out partitions separately with an explicit warning:

@@ -6,7 +6,7 @@ Implements all 5 project steps:
 3. Model training: SVM and Random Forest tuned on val, evaluated once on test, plus majority baseline.
 4. Results file: results/final/results.md with accuracy, macro P/R/F1, confusion matrices, latency, class counts.
 5. Comparison table: RGB vs HSV vs Lab, segmented vs unsegmented (background interference).
-Saves best model to models/ripeness_classifier.joblib.
+Saves best model to models/ripeness_classifier.pkl.
 """
 
 import os
