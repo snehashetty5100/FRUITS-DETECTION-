@@ -16,6 +16,7 @@ All models were trained strictly on the `Train` split (2,832 images), tuned on t
 
 - **Feature extraction latency:** Average ~114 ms per image (Lab K-Means + morphological cleanup + 34-dim feature vector).
 - **Model evaluation latency:** Random Forest (0.10 ms) and SVM (0.24 ms) provide real-time inference suitable for Streamlit deployment.
+- *Note: ~114 ms is a fixed estimate written in the script, not a measured value.*
 
 ---
 
@@ -39,9 +40,9 @@ The table below lists exact precision, recall, F1, and class support counts for 
 ## 3. Confusion Matrices
 
 High-contrast confusion matrix plots with counts and normalized row percentages:
-- [cm_svm.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/cm_svm.png)
-- [cm_rf.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/cm_rf.png)
-- [cm_baseline.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/cm_baseline.png)
+- [cm_svm.png](cm_svm.png)
+- [cm_rf.png](cm_rf.png)
+- [cm_baseline.png](cm_baseline.png)
 
 ---
 
@@ -62,28 +63,30 @@ Addressing the two central hypotheses from the project brief:
 | **All Features (Combined)** | 34 | Without Segmentation (Raw Image) | 83.55% | 80.11% | Baseline |
 | **All Features (Combined)** | 34 | With Segmentation (Masked Fruit) | **83.06%** | **79.91%** | -0.49% |
 
+*Note: This comparison table was scored on the test split with `SVC(C=25.0, gamma="scale")`.*
+
 ### Key Observations:
-1. **Background Interference & Shortcut Learning:** In perceptually decoupled color spaces (HSV and Lab), extracting features **strictly from the segmented fruit** yields solid gains (+2.80% for HSV, +0.99% for Lab) over raw images. In RGB, unsegmented photos showed spurious correlation because external background artifacts (e.g. green garden foliage or dark wooden table surfaces) acted as shortcuts. Segmenting the fruit forces the classifier to evaluate true fruit peel pigments rather than background context.
-2. **Superiority of Perceptually Uniform Spaces:** CIE-Lab and HSV consistently outperform RGB. Because Lab separates lightness ($L^*$) from chromatic opponent channels ($a^*$ and $b^*$), the model is robust to illumination variations and shadows across real-world photos.
-3. **Combined Representation:** Fusing Lab chromatic moments with circular Hue histograms achieves the highest overall accuracy (83.88% with Random Forest, 83.06% with SVM) and macro F1 score.
+1. **Background Interference:** In perceptually decoupled color spaces (HSV and Lab), extracting features **strictly from the segmented fruit** yields gains (+2.80% for HSV, +0.99% for Lab) over raw images. For RGB alone, segmenting the fruit lowered test accuracy by 4.11%, and the cause was not separately tested.
+2. **Perceptually Decoupled Color Spaces:** CIE-Lab and HSV outperformed RGB on this test split. Lab separates lightness ($L^*$) from chromatic opponent channels ($a^*$ and $b^*$), though lighting invariance was not separately tested.
+3. **Combined Representation:** Fusing RGB, HSV, and Lab moments with a 16-bin histogram over hue 0-180 achieves 83.88% overall accuracy with Random Forest and 82.24% with the tuned SVM (`C=25.0`, `gamma=0.05`); the 83.06% figure belongs to the colour-space comparison SVM (`C=25.0`, `gamma="scale"`).
 
 ---
 
 ## 5. Segmentation Example Sheets
 
 12 visual sheets displaying the complete 3-stage process (`Original Photo` $\rightarrow$ `Binary Mask` $\rightarrow$ `Segmented Fruit Only`) are saved in `results/final/`:
-- [example_sheet_01_apple_ripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_01_apple_ripe.png)
-- [example_sheet_02_apple_unripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_02_apple_unripe.png)
-- [example_sheet_03_banana_unripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_03_banana_unripe.png)
-- [example_sheet_04_banana_ripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_04_banana_ripe.png)
-- [example_sheet_05_banana_overripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_05_banana_overripe.png)
-- [example_sheet_06_mango_unripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_06_mango_unripe.png)
-- [example_sheet_07_mango_ripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_07_mango_ripe.png)
-- [example_sheet_08_mango_overripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_08_mango_overripe.png)
-- [example_sheet_09_orange_ripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_09_orange_ripe.png)
-- [example_sheet_10_orange_unripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_10_orange_unripe.png)
-- [example_sheet_11_tomato_ripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_11_tomato_ripe.png)
-- [example_sheet_12_tomato_overripe.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/example_sheet_12_tomato_overripe.png)
+- [example_sheet_01_apple_ripe.png](example_sheet_01_apple_ripe.png)
+- [example_sheet_02_apple_unripe.png](example_sheet_02_apple_unripe.png)
+- [example_sheet_03_banana_unripe.png](example_sheet_03_banana_unripe.png)
+- [example_sheet_04_banana_ripe.png](example_sheet_04_banana_ripe.png)
+- [example_sheet_05_banana_overripe.png](example_sheet_05_banana_overripe.png)
+- [example_sheet_06_mango_unripe.png](example_sheet_06_mango_unripe.png)
+- [example_sheet_07_mango_ripe.png](example_sheet_07_mango_ripe.png)
+- [example_sheet_08_mango_overripe.png](example_sheet_08_mango_overripe.png)
+- [example_sheet_09_orange_ripe.png](example_sheet_09_orange_ripe.png)
+- [example_sheet_10_orange_unripe.png](example_sheet_10_orange_unripe.png)
+- [example_sheet_11_tomato_ripe.png](example_sheet_11_tomato_ripe.png)
+- [example_sheet_12_tomato_overripe.png](example_sheet_12_tomato_overripe.png)
 
 
 ---
@@ -96,5 +99,5 @@ As an exploratory benchmark, a lightweight 3-layer Convolutional Neural Network 
 | :--- | :--- | :---: | :---: | :---: | :---: | :---: |
 | **Small CNN (TensorFlow)** | 3 Conv Blocks (32/64/64) + GAP + Dropout | **71.71%** | **70.23%** | **63.37%** | **62.18%** | 5.60 ms/img |
 
-- **Confusion Matrix:** [cm_cnn.png](file:///C:/Users/sneha/OneDrive/Desktop/FIP/results/final/cm_cnn.png)
+- **Confusion Matrix:** [cm_cnn.png](cm_cnn.png)
 - **Comparison to Classical ML:** The classical pipeline (CIE-Lab K-Means + feature extraction + Random Forest / SVM) achieves competitive accuracy (**83.88%** RF vs. **71.71%** CNN) with faster training time and full interpretability over color and texture distributions.
