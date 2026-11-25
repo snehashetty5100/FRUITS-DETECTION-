@@ -1,21 +1,20 @@
 # Fruit Ripeness Detection Using Colour Segmentation and Machine Learning
 
-An end-to-end Computer Vision and Machine Learning college project to classify fruit varieties and identify their ripeness stage (*Unripe*, *Ripe*, *Overripe*) through color space transformation, segmentation, statistical color features, traditional ML, and Deep Learning (CNN).
+An end-to-end Computer Vision and Machine Learning university mini project to classify fruit ripeness stages (*Unripe*, *Ripe*, *Overripe*) through CIE-Lab K-Means colour segmentation, morphological cleanup, statistical colour features, traditional ML, and an optional Deep Learning (CNN) benchmark.
 
 ---
 
 ## 📌 Project Overview
 
 - **Project Title:** Fruit Ripeness Detection Using Colour Segmentation and Machine Learning
-- **Core Objective:** Develop an automated visual inspection system that accepts fruit images, performs color segmentation, extracts multi-color space features, and classifies the ripeness level.
-- **Supported Fruits:**
-  1. Banana
-  2. Mango
-  3. Papaya
-  4. Apple
-  5. Orange
-  6. Tomato
-- **Ripeness Stages:**
+- **Core Objective:** Develop an automated visual inspection system that segments fruit foreground pixels using CIE-Lab K-Means clustering, extracts multi-colour space features, and classifies the ripeness stage across 3 classes (`Unripe`, `Ripe`, `Overripe`). (The task is ripeness classification only, not fruit variety classification.)
+- **Supported Fruits (5):**
+  1. Apple
+  2. Banana
+  3. Mango
+  4. Orange
+  5. Tomato
+- **Ripeness Stages (3):**
   1. `Unripe`
   2. `Ripe`
   3. `Overripe`
@@ -25,61 +24,60 @@ An end-to-end Computer Vision and Machine Learning college project to classify f
 ## 📁 Project Directory Structure
 
 ```text
-Fruit-Ripeness-Detection/
+FRUITS-DETECTION-/
 │
 ├── dataset/
-│   ├── raw/                  # Original raw images categorized by fruit and ripeness
-│   │   ├── apple/            # unripe/, ripe/, overripe/
-│   │   ├── banana/           # unripe/, ripe/, overripe/
-│   │   ├── mango/            # unripe/, ripe/, overripe/
-│   │   ├── orange/           # unripe/, ripe/, overripe/
-│   │   ├── papaya/           # unripe/, ripe/, overripe/
-│   │   └── tomato/           # unripe/, ripe/, overripe/
-│   └── processed/            # Standardized, resized, and segmented images
-│       ├── apple/
-│       ├── banana/
-│       ├── mango/
-│       ├── orange/
-│       ├── papaya/
-│       └── tomato/
+│   ├── ripeness/                 # Gitignored image folders (not stored in the repo)
+│   ├── ripeness_splits.csv       # 70/15/15 stratified train/val/test split (seed 42, 4,047 images)
+│   ├── ripeness_manifest.csv     # Deduplicated image manifest with metadata and hashes
+│   ├── manifest.csv              # Ground-truth mask manifest header
+│   ├── mask_manifest.csv         # Segmentation mask manifest
+│   ├── LICENSES.csv              # Dataset source and licence metadata
+│   ├── annotation_queue/         # Sample fruit photos (used by the Streamlit app demo selector)
+│   └── rejected_handsourced/     # Archived earlier handsourced data (not used in final pipeline)
 │
-├── notebooks/                # Exploratory Jupyter Notebooks for experiments
+├── notebooks/
 │   └── README.md
 │
-├── src/                      # Core modular Python source code
-│   ├── __init__.py           # Package initializer
-│   ├── preprocessing.py      # Resizing, normalization, color space conversions
-│   ├── segmentation.py       # HSV thresholding, K-means clustering, morphological cleanup
-│   ├── feature_extraction.py # Statistical color moments (RGB, HSV, Lab) and histograms
-│   ├── train_ml.py           # Traditional ML classifiers (SVM & Random Forest)
-│   ├── train_cnn.py          # Deep Learning CNN architecture and training
-│   ├── predict.py            # End-to-end inference & latency benchmarking
-│   └── utils.py              # Plotting, confusion matrix generation, metric exporters
+├── src/                          # Python source modules
+│   ├── __init__.py
+│   ├── preprocessing.py          # Pillow + NumPy image loading, RGB->HSV, RGB->CIE-Lab
+│   ├── segmentation.py           # K-Means foreground isolation & SciPy morphological cleanup
+│   ├── rebuild_ripeness_splits.py# Near-duplicate aHash/SHA-256 merging & 70/15/15 split builder
+│   ├── run_final_pipeline.py     # End-to-end segmentation, 34-dim feature extraction, ML & report
+│   ├── train_cnn.py              # Optional TensorFlow small CNN benchmark (100x100 segmented input)
+│   ├── build_ripeness_manifest.py# Manifest builder for dataset/ripeness/
+│   ├── ripeness_loader.py        # Ripeness dataset CSV/directory loader
+│   └── ...                       # Earlier / unused experimental & scaffolding scripts
 │
-├── models/                   # Saved model weights (.joblib, .keras)
-├── results/                  # Evaluation figures, confusion matrices, and metrics CSVs
-│   ├── figures/
-│   └── metrics/
+├── models/
+│   ├── ripeness_classifier.pkl   # Saved tuned SVM (RBF) + StandardScaler + class metadata
+│   └── ripeness_cnn.keras        # Saved optional TensorFlow CNN model
 │
-├── app/                      # Streamlit interactive web application
-│   └── app.py
+├── results/
+│   ├── final/                    # Final report (results.md), features.csv, CMs & 12 example sheets
+│   ├── phase2_ripeness_inventory/# Split sample grids
+│   ├── phase3/                   # Segmentation overlay images
+│   └── archive_handsourced/      # Archived earlier outputs
 │
-├── requirements.txt          # Python dependencies
-├── .gitignore                # Git ignore configuration
-└── README.md                 # Project documentation
+├── app/
+│   └── app.py                    # Streamlit interactive web application (uses SVM .pkl)
+│
+├── requirements.txt              # Python dependencies
+├── .gitignore                    # Git ignore configuration
+└── README.md                     # Project documentation
 ```
 
 ---
 
 ## ⚙️ Technical Stack
 
-- **Language:** Python 3.9+
-- **Image Processing & Vision:** OpenCV (`cv2`), Pillow (`PIL`)
-- **Scientific Computing & Data:** NumPy, Pandas
-- **Visualization:** Matplotlib, Seaborn
-- **Machine Learning:** Scikit-Learn (SVM, Random Forest, metrics)
-- **Deep Learning:** TensorFlow / Keras (CNN)
+- **Language:** Python (see `requirements.txt`; OpenCV and Pandas are not used)
+- **Image Processing & Vision:** Pillow (`PIL`), NumPy, SciPy (`scipy.ndimage`)
+- **Machine Learning:** Scikit-Learn (`SVC`, `RandomForestClassifier`, `StandardScaler`, metrics)
+- **Deep Learning (Optional Extension):** TensorFlow / Keras (CNN)
 - **Web Interface:** Streamlit
+- **Data I/O:** Python standard library `csv` and `pickle`
 
 ---
 
@@ -87,57 +85,72 @@ Fruit-Ripeness-Detection/
 
 ```mermaid
 flowchart LR
-    A["Raw Image Input"] --> B["Preprocessing & Normalization"]
-    B --> C["Color Space Conversions (RGB, HSV, Lab)"]
-    C --> D["Segmentation (K-Means / Thresholding)"]
-    D --> E["Morphological Noise Removal"]
-    E --> F["Feature Extraction (Color Moments)"]
-    F --> G["Traditional ML (SVM / RF)"]
-    C --> H["CNN Classifier"]
-    G --> I["Ripeness Output & Metrics"]
-    H --> I
-    I --> J["Streamlit Web UI"]
+    A["Raw Image Input (300x300)"] --> B["Preprocessing (RGB -> CIE-Lab & HSV)"]
+    B --> C["Segmentation (Lab K-Means, k=3)"]
+    C --> D["Morphological Cleanup"]
+    D --> E["Feature Extraction (34 Features)"]
+    E --> F["Traditional ML (SVM / RF)"]
+    D --> G["Optional CNN (100x100)"]
+    F --> H["Ripeness Output & Metrics"]
+    G --> H
+    H --> I["Streamlit Web UI (SVM .pkl)"]
 ```
 
-1. **Preprocessing:** Standardize input resolution (224x224), convert to float normalization [0, 1].
-2. **Color Space Transformations:** Examine variations across RGB, HSV (hue invariance), and CIE-Lab (perceptual color uniformity).
-3. **Segmentation & Denoising:** Segment fruit foreground with HSV thresholding / K-Means clustering, followed by morphological opening and closing.
-4. **Feature Extraction:** Compute color moments (Mean, Standard Deviation, Skewness) across all 9 color channels, plus color histograms.
-5. **Classification Models:**
-   - **Support Vector Machine (SVM):** Non-linear RBF kernel on scaled color features.
-   - **Random Forest:** Ensemble decision trees.
-   - **Convolutional Neural Network (CNN):** 2D convolutional feature extractor trained directly on pixel data.
-6. **Evaluation Metrics:** Accuracy, Precision, Recall, Macro F1-score, Confusion Matrix, and Inference Latency (ms).
+1. **Preprocessing:** Load 300×300 RGB images via Pillow (compositing alpha onto white) and convert pixels to HSV (`H: 0–179, S: 0–255, V: 0–255`) and CIE-Lab (`L, a, b: 0–255`) using pure NumPy.
+2. **Segmentation & Cleanup:** Segment fruit foreground using CIE-Lab K-Means clustering (`k=3`) followed by foreground cluster isolation and morphological cleanup (opening, closing, hole filling, largest connected component).
+3. **Feature Extraction (34 features):** Extract mean and standard deviation across RGB, HSV, and CIE-Lab channels (18 features) plus a 16-bin histogram over hue `0–180` (16 features; no skewness).
+4. **Classification Models:**
+   - **Support Vector Machine (SVM):** RBF kernel on standardized 34-dim features, tuned on validation (`C=25.0`, `gamma=0.05`) and saved to `models/ripeness_classifier.pkl`.
+   - **Random Forest:** Ensemble decision trees tuned on validation (`n_estimators=50`, `max_depth=12`).
+   - **Small CNN (Optional):** 3-layer Conv2D + MaxPooling2D + GlobalAveragePooling2D + Dropout + Dense(64) + Dense(3) trained on 100×100 segmented fruit images and saved to `models/ripeness_cnn.keras`.
+5. **Evaluation & App:** Metrics and confusion matrices are written to `results/final/results.md`. Note that the Random Forest is evaluated in the pipeline report but is not saved to disk; the Streamlit app (`app/app.py`) loads `models/ripeness_classifier.pkl` and uses the saved SVM.
 
 ---
 
-## 🚀 Getting Started
+## 🚀 How to Run
 
-### 1. Prerequisites & Environment Setup
+Run all commands from the repository root (`FRUITS-DETECTION-`) in this order:
 
-Create and activate a virtual environment:
+1. **Create and activate a virtual environment (optional, Windows PowerShell):**
 
-```bash
-# Windows (PowerShell)
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
+   ```powershell
+   python -m venv venv
+   .\venv\Scripts\Activate.ps1
+   ```
 
-Install required dependencies:
+2. **Install dependencies:**
 
-```bash
-pip install -r requirements.txt
-```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### 2. Launch the Web Interface
+3. **Rebuild stratified splits** *(needs `dataset/ripeness/`, which is gitignored and not in the repo)*:
 
-```bash
-streamlit run app/app.py
-```
+   ```bash
+   python src/rebuild_ripeness_splits.py
+   ```
+
+4. **Run the main ML pipeline** *(needs the images in `dataset/ripeness/`)*:
+
+   ```bash
+   python src/run_final_pipeline.py
+   ```
+
+5. **Train the optional CNN** *(run AFTER `run_final_pipeline.py`, as it appends Section 6 to `results/final/results.md`)*:
+
+   ```bash
+   python src/train_cnn.py
+   ```
+
+6. **Launch the Streamlit web app** *(needs only `models/ripeness_classifier.pkl` and `dataset/annotation_queue/` samples)*:
+
+   ```bash
+   streamlit run app/app.py
+   ```
 
 ---
 
 ## 📊 Dataset Policy & Integrity
 
-- **Fruits-360 Reference:** Used for fruit category reference; note that Fruits-360 labels represent variety rather than ripeness stages.
-- **Ripeness Ground Truth:** Datasets must provide genuine labels for `Unripe`, `Ripe`, and `Overripe`. No synthetic or fake datasets will be introduced.
+- **Dataset source:** NOT RECORDED - to be filled by author
+- **Ripeness Ground Truth:** Labels represent genuine ripeness stages (`Unripe`, `Ripe`, `Overripe`) across 5 fruits (`apple`, `banana`, `mango`, `orange`, `tomato`) in a 70/15/15 stratified split (`Train: 2,832`, `Val: 607`, `Test: 608`; total `4,047` images) with near-duplicate grouping (`seed=42`).
