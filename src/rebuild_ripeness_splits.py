@@ -302,7 +302,7 @@ def run_rebuild():
     for item in canonical_items:
         table_counts[(item["fruit"], item["stage"])][item["split"]] += 1
 
-    all_fruits = ["apple", "banana", "mango", "orange", "papaya", "tomato"]
+    all_fruits = ["apple", "banana", "mango", "orange", "tomato"]
     all_stages = ["unripe", "ripe", "overripe"]
 
     print("\n" + "=" * 65)
