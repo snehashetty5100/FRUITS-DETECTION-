@@ -9,11 +9,13 @@ scipy==1.17.1
 scikit-learn==1.9.1
 tensorflow==2.21.0
 
-# Visualization & Interactive Web Interface
-matplotlib==3.11.2
-seaborn==0.13.2
+# Interactive Web Interface
 streamlit==1.67.0
 
-# Utilities
+# Visualization (only used by unused modules)
+matplotlib==3.11.2
+seaborn==0.13.2
+
+# Utilities (only used by unused modules)
 joblib==1.6.0
 tqdm==4.70.1
