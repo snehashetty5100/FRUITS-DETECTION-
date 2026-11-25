@@ -573,6 +573,7 @@ All models were trained strictly on the `Train` split (2,832 images), tuned on t
 
 - **Feature extraction latency:** Average ~114 ms per image (Lab K-Means + morphological cleanup + 34-dim feature vector).
 - **Model evaluation latency:** Random Forest ({rf_inference_time_ms:.2f} ms) and SVM ({svm_inference_time_ms:.2f} ms) provide real-time inference suitable for Streamlit deployment.
+- *Note: ~114 ms is a fixed estimate written in the script, not a measured value.*
 
 ---
 
@@ -596,9 +597,9 @@ The table below lists exact precision, recall, F1, and class support counts for 
 ## 3. Confusion Matrices
 
 High-contrast confusion matrix plots with counts and normalized row percentages:
-- [cm_svm.png](file:///{os.path.abspath('results/final/cm_svm.png').replace(chr(92), '/')})
-- [cm_rf.png](file:///{os.path.abspath('results/final/cm_rf.png').replace(chr(92), '/')})
-- [cm_baseline.png](file:///{os.path.abspath('results/final/cm_baseline.png').replace(chr(92), '/')})
+- [cm_svm.png](cm_svm.png)
+- [cm_rf.png](cm_rf.png)
+- [cm_baseline.png](cm_baseline.png)
 
 ---
 
@@ -611,36 +612,38 @@ Addressing the two central hypotheses from the project brief:
 | Feature Set | Dimensions | Pipeline | Test Accuracy | Test Macro F1 | Gain from Segmentation |
 | :--- | :---: | :--- | :---: | :---: | :---: |
 | **RGB Only** | 6 | Without Segmentation (Raw Image) | {comparison_results[1]['accuracy']*100:.2f}% | {comparison_results[1]['macro_f1']*100:.2f}% | Baseline |
-| **RGB Only** | 6 | With Segmentation (Masked Fruit) | {comparison_results[0]['accuracy']*100:.2f}% | {comparison_results[0]['macro_f1']*100:.2f}% | **+{(comparison_results[0]['accuracy'] - comparison_results[1]['accuracy'])*100:+.2f}%** |
+| **RGB Only** | 6 | With Segmentation (Masked Fruit) | {comparison_results[0]['accuracy']*100:.2f}% | {comparison_results[0]['macro_f1']*100:.2f}% | {f"**+{(comparison_results[0]['accuracy'] - comparison_results[1]['accuracy'])*100:.2f}%**" if comparison_results[0]['accuracy'] > comparison_results[1]['accuracy'] else f"{(comparison_results[0]['accuracy'] - comparison_results[1]['accuracy'])*100:+.2f}%"} |
 | **HSV Only (+ Hue Hist)** | 22 | Without Segmentation (Raw Image) | {comparison_results[3]['accuracy']*100:.2f}% | {comparison_results[3]['macro_f1']*100:.2f}% | Baseline |
-| **HSV Only (+ Hue Hist)** | 22 | With Segmentation (Masked Fruit) | {comparison_results[2]['accuracy']*100:.2f}% | {comparison_results[2]['macro_f1']*100:.2f}% | **+{(comparison_results[2]['accuracy'] - comparison_results[3]['accuracy'])*100:+.2f}%** |
+| **HSV Only (+ Hue Hist)** | 22 | With Segmentation (Masked Fruit) | {comparison_results[2]['accuracy']*100:.2f}% | {comparison_results[2]['macro_f1']*100:.2f}% | {f"**+{(comparison_results[2]['accuracy'] - comparison_results[3]['accuracy'])*100:.2f}%**" if comparison_results[2]['accuracy'] > comparison_results[3]['accuracy'] else f"{(comparison_results[2]['accuracy'] - comparison_results[3]['accuracy'])*100:+.2f}%"} |
 | **Lab Only** | 6 | Without Segmentation (Raw Image) | {comparison_results[5]['accuracy']*100:.2f}% | {comparison_results[5]['macro_f1']*100:.2f}% | Baseline |
-| **Lab Only** | 6 | With Segmentation (Masked Fruit) | {comparison_results[4]['accuracy']*100:.2f}% | {comparison_results[4]['macro_f1']*100:.2f}% | **+{(comparison_results[4]['accuracy'] - comparison_results[5]['accuracy'])*100:+.2f}%** |
+| **Lab Only** | 6 | With Segmentation (Masked Fruit) | {comparison_results[4]['accuracy']*100:.2f}% | {comparison_results[4]['macro_f1']*100:.2f}% | {f"**+{(comparison_results[4]['accuracy'] - comparison_results[5]['accuracy'])*100:.2f}%**" if comparison_results[4]['accuracy'] > comparison_results[5]['accuracy'] else f"{(comparison_results[4]['accuracy'] - comparison_results[5]['accuracy'])*100:+.2f}%"} |
 | **All Features (Combined)** | 34 | Without Segmentation (Raw Image) | {comparison_results[7]['accuracy']*100:.2f}% | {comparison_results[7]['macro_f1']*100:.2f}% | Baseline |
-| **All Features (Combined)** | 34 | With Segmentation (Masked Fruit) | **{comparison_results[6]['accuracy']*100:.2f}%** | **{comparison_results[6]['macro_f1']*100:.2f}%** | **+{(comparison_results[6]['accuracy'] - comparison_results[7]['accuracy'])*100:+.2f}%** |
+| **All Features (Combined)** | 34 | With Segmentation (Masked Fruit) | **{comparison_results[6]['accuracy']*100:.2f}%** | **{comparison_results[6]['macro_f1']*100:.2f}%** | {f"**+{(comparison_results[6]['accuracy'] - comparison_results[7]['accuracy'])*100:.2f}%**" if comparison_results[6]['accuracy'] > comparison_results[7]['accuracy'] else f"{(comparison_results[6]['accuracy'] - comparison_results[7]['accuracy'])*100:+.2f}%"} |
+
+*Note: This comparison table was scored on the test split with `SVC(C={best_svm_params['C']}, gamma="scale")`.*
 
 ### Key Observations:
-1. **Background Interference Elimination:** For every single feature representation, extracting features **strictly from the segmented fruit** yields a substantial accuracy increase compared to whole-image extraction. Unsegmented images contain tables, kitchen walls, hands, and green leaves that mislead color histograms.
-2. **Superiority of Perceptually Uniform Spaces:** CIE-Lab and HSV consistently outperform RGB. Because Lab separates lightness ($L^*$) from chromatic opponent channels ($a^*$ and $b^*$), the model is robust to illumination variations and shadows across real-world photos.
-3. **Combined Representation:** Fusing Lab chromatic moments with circular Hue histograms achieves the highest overall accuracy and macro F1 score.
+1. **Background Interference:** In perceptually decoupled color spaces (HSV and Lab), extracting features **strictly from the segmented fruit** yields gains ({(comparison_results[2]['accuracy'] - comparison_results[3]['accuracy'])*100:+.2f}% for HSV, {(comparison_results[4]['accuracy'] - comparison_results[5]['accuracy'])*100:+.2f}% for Lab) over raw images. For RGB alone, segmenting the fruit lowered test accuracy by {abs((comparison_results[0]['accuracy'] - comparison_results[1]['accuracy'])*100):.2f}%, and the cause was not separately tested.
+2. **Perceptually Decoupled Color Spaces:** CIE-Lab and HSV outperformed RGB on this test split. Lab separates lightness ($L^*$) from chromatic opponent channels ($a^*$ and $b^*$), though lighting invariance was not separately tested.
+3. **Combined Representation:** Fusing RGB, HSV, and Lab moments with a 16-bin histogram over hue 0-180 achieves {rf_acc*100:.2f}% overall accuracy with Random Forest and {svm_acc*100:.2f}% with the tuned SVM (`C={best_svm_params['C']}`, `gamma={best_svm_params['gamma']}`); the {comparison_results[6]['accuracy']*100:.2f}% figure belongs to the colour-space comparison SVM (`C={best_svm_params['C']}`, `gamma="scale"`).
 
 ---
 
 ## 5. Segmentation Example Sheets
 
 12 visual sheets displaying the complete 3-stage process (`Original Photo` $\\rightarrow$ `Binary Mask` $\\rightarrow$ `Segmented Fruit Only`) are saved in `results/final/`:
-- [example_sheet_01_apple_ripe.png](file:///{os.path.abspath('results/final/example_sheet_01_apple_ripe.png').replace(chr(92), '/')})
-- [example_sheet_02_apple_unripe.png](file:///{os.path.abspath('results/final/example_sheet_02_apple_unripe.png').replace(chr(92), '/')})
-- [example_sheet_03_banana_unripe.png](file:///{os.path.abspath('results/final/example_sheet_03_banana_unripe.png').replace(chr(92), '/')})
-- [example_sheet_04_banana_ripe.png](file:///{os.path.abspath('results/final/example_sheet_04_banana_ripe.png').replace(chr(92), '/')})
-- [example_sheet_05_banana_overripe.png](file:///{os.path.abspath('results/final/example_sheet_05_banana_overripe.png').replace(chr(92), '/')})
-- [example_sheet_06_mango_unripe.png](file:///{os.path.abspath('results/final/example_sheet_06_mango_unripe.png').replace(chr(92), '/')})
-- [example_sheet_07_mango_ripe.png](file:///{os.path.abspath('results/final/example_sheet_07_mango_ripe.png').replace(chr(92), '/')})
-- [example_sheet_08_mango_overripe.png](file:///{os.path.abspath('results/final/example_sheet_08_mango_overripe.png').replace(chr(92), '/')})
-- [example_sheet_09_orange_ripe.png](file:///{os.path.abspath('results/final/example_sheet_09_orange_ripe.png').replace(chr(92), '/')})
-- [example_sheet_10_orange_unripe.png](file:///{os.path.abspath('results/final/example_sheet_10_orange_unripe.png').replace(chr(92), '/')})
-- [example_sheet_11_tomato_ripe.png](file:///{os.path.abspath('results/final/example_sheet_11_tomato_ripe.png').replace(chr(92), '/')})
-- [example_sheet_12_tomato_overripe.png](file:///{os.path.abspath('results/final/example_sheet_12_tomato_overripe.png').replace(chr(92), '/')})
+- [example_sheet_01_apple_ripe.png](example_sheet_01_apple_ripe.png)
+- [example_sheet_02_apple_unripe.png](example_sheet_02_apple_unripe.png)
+- [example_sheet_03_banana_unripe.png](example_sheet_03_banana_unripe.png)
+- [example_sheet_04_banana_ripe.png](example_sheet_04_banana_ripe.png)
+- [example_sheet_05_banana_overripe.png](example_sheet_05_banana_overripe.png)
+- [example_sheet_06_mango_unripe.png](example_sheet_06_mango_unripe.png)
+- [example_sheet_07_mango_ripe.png](example_sheet_07_mango_ripe.png)
+- [example_sheet_08_mango_overripe.png](example_sheet_08_mango_overripe.png)
+- [example_sheet_09_orange_ripe.png](example_sheet_09_orange_ripe.png)
+- [example_sheet_10_orange_unripe.png](example_sheet_10_orange_unripe.png)
+- [example_sheet_11_tomato_ripe.png](example_sheet_11_tomato_ripe.png)
+- [example_sheet_12_tomato_overripe.png](example_sheet_12_tomato_overripe.png)
 """
 
     with open(results_md_path, "w", encoding="utf-8") as f:
